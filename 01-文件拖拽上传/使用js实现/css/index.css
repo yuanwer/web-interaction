@@ -1,0 +1,13 @@
+#uploadDiv {
+    width: 160px;
+    height: 160px;
+    border: 2px dashed #e8e8e8;
+}
+
+#uploadDiv.drag-over {
+    border-color: #498ef3;
+}
+
+#uploadInput {
+   display: none;
+}
