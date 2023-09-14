@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .switch {
+        /* 隐藏原生复选框的样式 */
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        -o-appearance: none;
+        outline: none;
+
+        /* 为复选框设置相对定位 */
+        position: relative;
+
+        /* 美化样式 */
+        width: 84px;
+        height: 34px;
+        background-color: #e8e8e8;
+        border-radius: 34px;
+        padding: 4px;
+        box-sizing: content-box;
+        cursor: pointer;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset,
+          rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+
+        /* 设置过渡效果 */
+        transition: all 0.3s;
+      }
+
+      .switch::before {
+        content: "";
+        position: absolute;
+        left: 4px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background-color: #fff;
+        transition: all 0.3s;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+          rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+      }
+
+      /* 复选框选中之后改变 switch 背景色 */
+      .switch:checked {
+        background-color: #409eff;
+      }
+
+      /* 复选框选中之后改变开关位置 */
+      .switch:checked::before {
+        left: 54px;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="checkbox" class="switch" id="switch" />
+
+    <script>
+      const switchEl = document.getElementById("switch");
+      switchEl.onchange = function () {
+        console.log(this.checked);
+      };
+    </script>
+  </body>
+</html>

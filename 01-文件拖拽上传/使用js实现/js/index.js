@@ -31,6 +31,14 @@ $uploadDiv.ondrop = e => {
     // 获取拖拽的文件
     console.log(e.dataTransfer.files)
     const file = e.dataTransfer.files[0]
+    // 检测文件的类型，只允许上传图片
+    if (file.type.indexOf('image') === -1) {
+        return
+    }
+    // 只允许上传10M以下的文件
+    if (file.size > 10 * 1024 * 1024) {
+        return
+    }
     uploadFile(file)
 }
 
