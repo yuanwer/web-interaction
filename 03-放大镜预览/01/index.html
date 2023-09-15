@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      /* 图片容器 */
+      .img-box {
+        width: 200px;
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+        cursor: move;
+      }
+      /* 图片 */
+      .img-box img {
+        width: 100%;
+        height: 100%;
+      }
+      /* 蒙层 */
+      .img-box .mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+        display: none;
+      }
+      /* 展示预览效果的盒子 */
+      .preview-box {
+        position: fixed;
+        top: 8px;
+        left: 300px;
+        width: 400px;
+        height: 400px;
+        display: none;
+        /* 将图片设置为背景图，通过改变背景位置来展示图片的不同部分 */
+        background: url("./assets/1.png") no-repeat;
+        background-size: 800px 800px;
+        background-position: 0 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="img-box" id="imgBox">
+      <!-- 需要放大预览的图片 -->
+      <img src="./assets/1.png" alt="" />
+      <!-- 鼠标指针的蒙层 -->
+      <div class="mask" id="mask"></div>
+    </div>
+
+    <!-- 预览区域 -->
+    <div class="preview-box" id="previewBox"></div>
+
+    <script>
+      const imgBox = document.querySelector("#imgBox");
+      const mask = document.querySelector("#mask");
+      const previewBox = document.querySelector("#previewBox");
+
+      // 下面是一些尺寸信息，此处固定写死，你也可以动态获取
+      // 盒子的宽高
+      const boxWidth = 200;
+      const boxHeight = 200;
+
+      // 蒙层的宽高
+      const maskWidth = 100;
+      const maskHeight = 100;
+
+      // 获取预览盒子的宽高
+      const previewBoxWidth = 400;
+      const previewBoxHeight = 400;
+
+      // 预览盒子背景图的宽高
+      const bgWidth = 800;
+      const bgHeight = 800;
+
+      // 鼠标移入imgBox，显示蒙层和预览区域
+      imgBox.addEventListener("mouseenter", function (e) {
+        mask.style.display = "block";
+        previewBox.style.display = "block";
+      });
+
+      // 鼠标移出imgBox，隐藏蒙层和预览区域
+      imgBox.addEventListener("mouseleave", function (e) {
+        mask.style.display = "none";
+        previewBox.style.display = "none";
+      });
+
+      // 鼠标在imgBox内移动，蒙层跟随鼠标移动
+      imgBox.addEventListener("mousemove", function (e) {
+        // 获取鼠标在盒子内的坐标
+        const mouseX = e.offsetX;
+        const mouseY = e.offsetY;
+
+        // 计算蒙层的位置
+        let maskX = mouseX - maskWidth / 2;
+        let maskY = mouseY - maskHeight / 2;
+
+        // 边界检测，防止蒙层超出盒子
+        if (maskX <= 0) {
+          maskX = 0;
+        } else if (maskX >= boxWidth - maskWidth) {
+          maskX = boxWidth - maskWidth;
+        }
+        mask.style.left = maskX + "px";
+
+        if (maskY <= 0) {
+          maskY = 0;
+        } else if (maskY >= boxHeight - maskHeight) {
+          maskY = boxHeight - maskHeight;
+        }
+        mask.style.top = maskY + "px";
+
+        // 计算预览区域图片的背景位置偏移比例，要求 mask的宽高与img的宽高的比例，和预览区域的宽高与背景图的宽高的比例一致
+        const bgX = (maskX / boxWidth) * bgWidth;
+        const bgY = (maskY / boxHeight) * bgHeight;
+
+        // 设置预览区域图片的背景位置
+        previewBox.style.backgroundPosition = `-${bgX}px -${bgY}px`;
+      });
+    </script>
+  </body>
+</html>
