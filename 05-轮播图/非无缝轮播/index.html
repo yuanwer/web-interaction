@@ -55,13 +55,14 @@
     </style>
   </head>
   <body>
-    <div class="swiper">
+    <div class="swiper" id="swiper">
       <div class="swiper-wrapper" id="swiperWrapper"></div>
 
       <div class="swiper-pagination"></div>
     </div>
 
     <script>
+      const $swiper = document.getElementById('swiper')
       const $swiperWrapper = document.getElementById('swiperWrapper')
       const $swiperPagination = document.querySelector('.swiper-pagination')
       let currentIndex = 0
@@ -83,7 +84,7 @@
 
         const $swiperPaginationItem = document.createElement('div')
         $swiperPaginationItem.className = 'swiper-pagination-item'
-        $swiperPaginationItem.setAttribute('data-index', index)
+        $swiperPaginationItem.dataset.index = index
         swiperPaginationItemArr.push($swiperPaginationItem)
       })
 
@@ -92,9 +93,9 @@
 
       // 点击指示点，切换图片
       $swiperPagination.addEventListener('click', e => {
-        const index = e.target.getAttribute('data-index')
-        currentIndex = index
-        if (currentIndex) {
+        const index = e.target.dataset.index
+        if (index !== undefined) {
+          currentIndex = parseInt(index)
           changeImg(currentIndex)
         }
       })
@@ -110,33 +111,27 @@
         swiperPaginationItemArr[index].classList.add('active')
       }
 
-      // 初始化，默认展示第一张图片，第一个指示点高亮
-      changeImg(currentIndex)
-
       // 下一张
       function next() {
-        currentIndex++
-        if (currentIndex > imgList.length - 1) {
-          currentIndex = 0
-        }
+        // 如果当前是最后一张，从头开始
+        currentIndex = (currentIndex + 1) % imgList.length
         changeImg(currentIndex)
       }
 
+      // 初始化，默认展示第一张图片，第一个指示点高亮
+      changeImg(currentIndex)
+
       // 自动播放，如果超过最后一张图片，从头开始
-      let timer = setInterval(() => {
-        next()
-      }, 2000)
+      let timer = setInterval(next, 2000)
 
       // 鼠标放在图片上，停止播放
-      $swiperWrapper.addEventListener('mouseenter', () => {
+      $swiper.addEventListener('mouseenter', () => {
         clearInterval(timer)
       })
 
       // 鼠标离开图片，继续播放
-      $swiperWrapper.addEventListener('mouseleave', () => {
-        timer = setInterval(() => {
-          next()
-        }, 2000)
+      $swiper.addEventListener('mouseleave', () => {
+        timer = setInterval(next, 2000)
       })
     </script>
   </body>
