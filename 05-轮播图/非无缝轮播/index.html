@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .swiper {
+        margin: 100px auto;
+        position: relative;
+        width: 600px;
+        height: 400px;
+        overflow: hidden;
+      }
+
+      .swiper-wrapper {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        transition: transform 0.5s;
+      }
+
+      .swiper-item {
+        flex-shrink: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .swiper-pagination {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        /* 毛玻璃背景 */
+        background-color: rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        padding: 5px;
+      }
+
+      .swiper-pagination-item {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        margin: 0 5px;
+        border-radius: 50%;
+        background-color: #eee;
+        cursor: pointer;
+      }
+
+      .swiper-pagination-item.active {
+        background-color: orange;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="swiper">
+      <div class="swiper-wrapper" id="swiperWrapper"></div>
+
+      <div class="swiper-pagination"></div>
+    </div>
+
+    <script>
+      const $swiperWrapper = document.getElementById('swiperWrapper')
+      const $swiperPagination = document.querySelector('.swiper-pagination')
+      let currentIndex = 0
+
+      // 创建图片数组，包含5张图片，使用随机图https://picsum.photos/600/400?random=1-5
+      const imgList = Array.from({ length: 5 }).map(
+        (_, index) => `https://picsum.photos/600/400?random=${index + 1}`
+      )
+
+      const swiperItemArr = []
+      const swiperPaginationItemArr = []
+
+      // 生成图片节点和指示点节点，插入容器
+      imgList.forEach((imgSrc, index) => {
+        const $swiperItem = document.createElement('div')
+        $swiperItem.className = 'swiper-item'
+        $swiperItem.style.backgroundImage = `url(${imgSrc})`
+        swiperItemArr.push($swiperItem)
+
+        const $swiperPaginationItem = document.createElement('div')
+        $swiperPaginationItem.className = 'swiper-pagination-item'
+        $swiperPaginationItem.setAttribute('data-index', index)
+        swiperPaginationItemArr.push($swiperPaginationItem)
+      })
+
+      $swiperWrapper.append(...swiperItemArr)
+      $swiperPagination.append(...swiperPaginationItemArr)
+
+      // 点击指示点，切换图片
+      $swiperPagination.addEventListener('click', e => {
+        const index = e.target.getAttribute('data-index')
+        currentIndex = index
+        if (currentIndex) {
+          changeImg(currentIndex)
+        }
+      })
+
+      function changeImg(index) {
+        // 切换图片
+        $swiperWrapper.style.transform = `translateX(-${index * 100}%)`
+
+        // 切换指示点
+        swiperPaginationItemArr.forEach($item => {
+          $item.classList.remove('active')
+        })
+        swiperPaginationItemArr[index].classList.add('active')
+      }
+
+      // 初始化，默认展示第一张图片，第一个指示点高亮
+      changeImg(currentIndex)
+
+      // 下一张
+      function next() {
+        currentIndex++
+        if (currentIndex > imgList.length - 1) {
+          currentIndex = 0
+        }
+        changeImg(currentIndex)
+      }
+
+      // 自动播放，如果超过最后一张图片，从头开始
+      let timer = setInterval(() => {
+        next()
+      }, 2000)
+
+      // 鼠标放在图片上，停止播放
+      $swiperWrapper.addEventListener('mouseenter', () => {
+        clearInterval(timer)
+      })
+
+      // 鼠标离开图片，继续播放
+      $swiperWrapper.addEventListener('mouseleave', () => {
+        timer = setInterval(() => {
+          next()
+        }, 2000)
+      })
+    </script>
+  </body>
+</html>
