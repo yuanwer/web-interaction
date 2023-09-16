@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>瀑布流布局</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: linear-gradient(
+          45deg,
+          #1e1e1e 25%,
+          #2a2a2a 25%,
+          #2a2a2a 50%,
+          #1e1e1e 50%,
+          #1e1e1e 75%,
+          #2a2a2a 75%,
+          #2a2a2a
+        );
+      }
+      .item {
+        width: 300px;
+        position: absolute;
+        box-shadow: 0 0 1px 2px #eeeeee4b;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .item::before {
+        position: absolute;
+        content: attr(data-index);
+        padding: 10px;
+        font-size: 18px;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-bottom-right-radius: 8px;
+        min-width: 2em;
+        text-align: center;
+        left: 0;
+        top: 0;
+      }
+      .item img {
+        width: 100%;
+        display: block;
+      }
+      #container {
+        position: relative;
+        width: 1000px;
+        margin: 0 auto;
+        height: 100vh;
+        overflow: hidden auto;
+      }
+
+      /* 隐藏#container的滚动条 */
+      #container::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script>
+      const container = document.querySelector('#container')
+      let imageCount = 0
+
+      // 生成100~700随机数，后面用作图片的高度
+      function getRandomHeight() {
+        return Math.floor(Math.random() * 600 + 100)
+      }
+
+      // 获取图片列表数据
+      function getImages() {
+        // 模拟请求生成50个图片数据
+        const images = []
+        for (let i = 0; i < 20; i++) {
+          const imageHeight = getRandomHeight()
+          images.push({
+            src: `https://picsum.photos/300/${imageHeight}`,
+            width: 300,
+            height: imageHeight
+          })
+        }
+        return images
+      }
+
+      function generateImagesElement(images) {
+        const elArr = []
+        for (let i = 0; i < images.length; i++) {
+          imageCount++
+          const el = document.createElement('div')
+          el.setAttribute('data-index', imageCount)
+          el.className = 'item'
+          el.innerHTML = `<img src="${images[i].src}" width="${images[i].width}" height="${images[i].height}" alt="" />`
+          elArr.push(el)
+        }
+        return elArr
+      }
+
+      function computedColsAndGap() {
+        // 计算列数
+        const columns = Math.floor(pageWidth / itemWidth)
+        // 计算水平间隙，比如有3列，那么有4个间隙
+        const gap = (pageWidth - itemWidth * columns) / (columns + 1)
+        return {
+          columns,
+          gap
+        }
+      }
+
+      // 瀑布流布局函数
+      function waterfallLayout(itemArr) {
+        // 遍历所有图片，设置位置
+        for (let i = 0; i < itemArr.length; i++) {
+          const columnIndex = getMinHeightColumnIndex(columnHeights)
+          itemArr[i].style.left = gap + columnIndex * (itemWidth + gap) + 'px'
+          itemArr[i].style.top = columnHeights[columnIndex] + 'px'
+          columnHeights[columnIndex] += itemArr[i].offsetHeight + topPosition
+        }
+      }
+
+      // 获取最小高度的列的索引
+      function getMinHeightColumnIndex(columnHeights) {
+        let minHeight = columnHeights[0]
+        let index = 0
+        // 遍历所有列的高度，找到最小高度的列的索引
+        for (let i = 0; i < columnHeights.length; i++) {
+          if (columnHeights[i] < minHeight) {
+            minHeight = columnHeights[i]
+            index = i
+          }
+        }
+
+        return index
+      }
+
+      const images = getImages()
+
+      const itemArr = generateImagesElement(images)
+
+      container.append(...itemArr)
+
+      // 图片加载完成后调用瀑布流布局
+      window.onload = function () {
+        waterfallLayout(itemArr)
+      }
+
+      // 获取页面宽度
+      const pageWidth = container.offsetWidth
+      // 获取单个图片宽度
+      const itemWidth = itemArr[0].offsetWidth
+
+      const { columns, gap } = computedColsAndGap()
+
+      // 设置垂直间隙
+      const topPosition = gap
+      // 用于存储每一列的高度
+      const columnHeights = new Array(columns).fill(topPosition)
+
+      // container 滚动触底时（举例contarner底部100px），加载更多
+      container.onscroll = function () {
+        const { scrollTop, scrollHeight, clientHeight } = this
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
+          const images = getImages()
+          const itemArr = generateImagesElement(images)
+          container.append(...itemArr)
+          waterfallLayout(itemArr)
+        }
+      }
+    </script>
+  </body>
+</html>
