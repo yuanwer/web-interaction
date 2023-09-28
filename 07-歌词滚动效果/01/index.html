@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        padding-top: 80px;
+        box-sizing: border-box;
+        background-color: #f2f6fc;
+      }
+
+      .container {
+        text-align: center;
+        overflow: hidden;
+        height: 450px;
+      }
+
+      audio {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 10;
+      }
+
+      li {
+        list-style: none;
+        height: 30px;
+        line-height: 30px;
+        transition: 0.5s;
+        font-size: 18px;
+        color: #909399;
+      }
+
+      li.active {
+        color: #409eff;
+        transform: scale(1.2);
+      }
+
+      .lrc-list {
+        transition: 0.5s;
+      }
+    </style>
+  </head>
+  <body>
+    <audio src="./data/11315.mp3" controls></audio>
+    <div class="container">
+      <ul class="lrc-list"></ul>
+    </div>
+
+    <script type="module">
+      import lrc from './data/lrc-data.js'
+
+      const doms = {
+        container: document.querySelector('.container'),
+        audio: document.querySelector('audio'),
+        lrcList: document.querySelector('.lrc-list')
+      }
+
+      /**
+       * 解析歌词
+       * @param {string} lrcString
+       * @returns {Array<{startTime: number, words: string}>}
+       */
+      function parseLRC(lrcString) {
+        const lrcs = lrcString.split('\n')
+        return lrcs.map(lrc => {
+          let [startTime, words] = lrc.split(']')
+
+          const [m, s] = startTime.slice(1).split(':')
+
+          return {
+            startTime: +m * 60 + +s + 0.5,
+            words
+          }
+        })
+      }
+
+      // 将歌词字符串转换为歌词数组
+      const lrcData = parseLRC(lrc)
+
+      /**
+       * 创建歌词元素
+       * @param {Array<{startTime: number, words: string}>} lrcArray
+       * @returns {DocumentFragment}
+       */
+      function createLRCElements(lrcArray) {
+        const flag = document.createDocumentFragment()
+        lrcArray.forEach(lrc => {
+          const li = document.createElement('li')
+          li.textContent = lrc.words
+          flag.appendChild(li)
+        })
+
+        return flag
+      }
+
+      // 创建歌词元素，将元素插入到lrcList
+      doms.lrcList.appendChild(createLRCElements(lrcData))
+
+      // 查找当前歌词的index
+      function findIndex() {
+        const currentTime = doms.audio.currentTime
+        const index = lrcData.findIndex(lrc => lrc.startTime > currentTime)
+
+        // 没找到，说明播放完了，返回最后一句歌词的index
+        if (index === -1) {
+          return lrcData.length - 1
+        }
+
+        // 第一句歌词
+        if (index === 0) {
+          return index
+        }
+
+        return index - 1
+      }
+
+      // 容器高度
+      const containerHeight = doms.container.clientHeight
+      // 每句歌词的高度
+      const lrcLineHeight = doms.lrcList.children[0].clientHeight
+      // 上一句歌词的index
+      let lastIndex = -1
+
+      function setOffset() {
+        const index = findIndex()
+        // 歌词没有变化，不需要设置
+        if (index === lastIndex) {
+          return
+        }
+
+        lastIndex = index
+
+        // 计算偏移量: index 行歌词的高度 - 容器高度的一半 + 一行歌词的高度的一半
+        // 加上一行歌词的高度的一半的原因是，让当前歌词在容器的中间
+        let top =
+          index * lrcLineHeight - containerHeight / 2 + lrcLineHeight / 2
+
+        // 获取上一句歌词
+        let li = doms.lrcList.querySelector('li.active')
+        // 如果有上一句歌词，移除active效果
+        if (li) {
+          li.classList.remove('active')
+        }
+
+        // 获取当前歌词
+        li = doms.lrcList.children[index]
+        // 如果有当前歌词，添加active效果
+        if (li) {
+          li.classList.add('active')
+        }
+
+        // 如果偏移量小于0，设置为0
+        if (top <= 0) {
+          top = 0
+        }
+        // 设置偏移量
+        doms.lrcList.style.transform = `translateY(-${top}px)`
+      }
+
+      // 监听歌曲播放时间的变化
+      doms.audio.addEventListener('timeupdate', setOffset)
+    </script>
+  </body>
+</html>
