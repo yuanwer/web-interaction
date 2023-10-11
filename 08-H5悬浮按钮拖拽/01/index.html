@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .flot-btn {
+        width: 80px;
+        height: 80px;
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        border-radius: 8px;
+        font-size: 50px;
+        text-align: center;
+        line-height: 80px;
+        box-shadow: 0 0 10px #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flot-btn">🤣</div>
+
+    <script>
+      // 获取flot-btn
+      const flotBtn = document.querySelector(".flot-btn");
+
+      let right = 0;
+      let bottom = 0;
+
+      // 给flot-btn添加touchstart事件
+      flotBtn.addEventListener("touchstart", function (e) {
+        // 获取手指按下的坐标
+        const startX = e.touches[0].clientX;
+        const startY = e.touches[0].clientY;
+        // 给flot-btn添加touchmove事件
+        flotBtn.addEventListener("touchmove", function (e) {
+          // 获取手指移动的坐标
+          const moveX = e.touches[0].clientX;
+          const moveY = e.touches[0].clientY;
+          // 计算手指移动的距离
+          const distanceX = moveX - startX;
+          const distanceY = moveY - startY;
+          // 设置flot-btn的位置
+          flotBtn.style.right =
+            Math.min(
+              Math.max(right - distanceX, 0),
+              document.body.clientWidth - flotBtn.offsetWidth
+            ) + "px";
+          flotBtn.style.bottom =
+            Math.min(
+              Math.max(bottom - distanceY, 0),
+              document.body.clientHeight - flotBtn.offsetHeight
+            ) + "px";
+
+          // 给flot-btn添加touchend事件
+          flotBtn.addEventListener("touchend", function () {
+            // 获取flot-btn的位置
+            right = parseFloat(flotBtn.style.right);
+            bottom = parseFloat(flotBtn.style.bottom);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
