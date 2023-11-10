@@ -63,14 +63,14 @@
               Math.max(bottom - distanceY, 0),
               document.body.clientHeight - flotBtn.offsetHeight
             ) + "px";
-
-          // 给flot-btn添加touchend事件
-          flotBtn.addEventListener("touchend", function () {
-            // 获取flot-btn的位置
-            right = parseFloat(flotBtn.style.right);
-            bottom = parseFloat(flotBtn.style.bottom);
-          });
         });
+      });
+
+      // 给flot-btn添加touchend事件
+      flotBtn.addEventListener("touchend", function () {
+        // 获取flot-btn的位置
+        right = parseFloat(flotBtn.style.right);
+        bottom = parseFloat(flotBtn.style.bottom);
       });
     </script>
   </body>
