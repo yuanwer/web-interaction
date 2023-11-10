@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            background-color: #fff;
+        }
+
+        .scroll-wrap {
+            /* 禁止触发下拉刷新 */
+            overscroll-behavior: contain;
+            height: 100dvh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+        }
+
+        /* 隐藏垂直滚动条 */
+        ::-webkit-scrollbar {
+            width: 0;
+        }
+
+        /* 隐藏水平滚动条 */
+        ::-webkit-scrollbar {
+            height: 0;
+        }
+
+        .item {
+            scroll-snap-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            height: 100dvh;
+            filter: invert(100%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scroll-wrap">
+        <div class="list"></div>
+    </div>
+
+    <script>
+        const doms = {
+            list: document.querySelector('.list'),
+        }
+
+        // 创建5个随机颜色的item，并返回
+        function createItems(count = 5) {
+            let str = ''
+            for (let i = 1; i <= count; i++) {
+                str += `<div class="item" style="background: ${getRandomColor()}">${i}</div>`
+            }
+            return str
+        }
+
+        // 随机颜色
+        function getRandomColor() {
+            return '#' + Math.random().toString(16).slice(2, 8)
+        }
+
+        doms.list.innerHTML = createItems()
+    </script>
+</body>
+
+</html>

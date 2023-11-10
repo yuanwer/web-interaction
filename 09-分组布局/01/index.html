@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .scroll-wrap {
+            width: 400px;
+            overflow: auto;
+            outline: 1px dashed #9747FF;
+            scroll-snap-type: x mandatory;
+        }
+
+        .list {
+            height: 200px;
+            column-width: 400px;
+        }
+
+        .item {
+            display: inline-flex;
+            width: 80px;
+            margin: 10px;
+            aspect-ratio: 1/1;
+            background: #FFE8A3;
+            color: #333;
+            font-size: 30px;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item:nth-child(8n+1) {
+            scroll-snap-align: start;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scroll-wrap">
+        <div class="list"></div>
+    </div>
+    <script>
+        const doms = {
+            list: document.querySelector('.list'),
+        }
+
+        function createItems(count = 14) {
+            let str = ''
+            for (let i = 1; i <= count; i++) {
+                str += `<div class="item">${i}</div>`
+            }
+            return str
+        }
+
+        doms.list.innerHTML = createItems()
+    </script>
+</body>
+
+</html>
